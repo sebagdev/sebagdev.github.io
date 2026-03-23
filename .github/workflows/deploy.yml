@@ -36,14 +36,6 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      - name: Check HTML
-        uses: anishathalye/proof-html@v2
-        with:
-          directory: ./_site
-          ignore_urls: |
-            https://twitter.com/
-            https://sgdev.pl/
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 

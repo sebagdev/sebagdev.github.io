@@ -67,8 +67,6 @@ comments:
 search: true
 search_full_content: true
 
-# SEO / Open Graph defaults
-og_image: "/assets/images/og-default.png"
 
 # Defaults
 defaults:
