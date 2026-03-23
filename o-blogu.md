@@ -1,16 +1,20 @@
 ---
-id: 9
-title: 'O blogu'
-date: '2017-03-06T17:10:52+01:00'
-author: sg
-layout: page
-guid: 'http://sgdev.pl/?page_id=9'
+title: "O blogu"
+layout: single
+permalink: /o-blogu/
+author_profile: true
 ---
 
-Blog nie posiada konkretnego celu zasadniczo powstał, aby stanowić zbiór notatek dla samego siebie i nie tylko… Jako, że dość często mam możliwość pracy ze świeżo przyjętymi junior developers/trainees, co zresztą bardzo lubię, postaram się część wpisów poświęcić tematyce, która może pomóc w rozwoju, doprecyzować praktycznie wiedzę wyniesioną z uczelni oraz może czasem uchroni od wymyślania koła na nowo.
+Blog powstał jako zbiór notatek — dla siebie i nie tylko.
 
-Ponadto będę umieszczał tutaj linki do materiałów na innych witrynach, które uważam za wartościowe i opatrzę je komentarzem dlaczego moim zdaniem warto zobaczyć, a także na co warto zwrócić uwagę.
+Mam to szczęście, że często pracuję z junior developerami i trainees, co bardzo lubię. Część wpisów staram się poświęcać tematyce, która może pomóc w rozwoju, doprecyzować praktycznie wiedzę wyniesioną z uczelni i uchronić od wymyślania koła na nowo.
 
-Cel wydaje się ambitny, ale zobaczymy co z tego wyjdzie i w którym kierunku ten blog powędruje przekonamy się już niedługo.. 🙂
+Tutaj znajdziesz wpisy o:
 
-To jest miejsce gdzie powinienem złożyć wszystkim czytelnikom, obietnicę w stylu „dwa wpisy w tygodniu w poniedziałek i w czwartek”, czy podobną, ale… nie zrobię tego. Pewna samodyscyplina jest ważna, ale jeśli programowanie i cokolwiek innego ma być waszą pasją to samoprzymuszanie się może doprowadzić raczej do zniechęcenia.
+- **Javie i Spring Boot** — wzorce, snippety, dobre praktyki
+- **SQL Server i PostgreSQL** — przydatne techniki, których brakuje w podstawowych tutorialach
+- **Chmurze (Azure, Heroku)** — praktyczne prototypowanie i wdrożenia
+- **Terraform i GitLab CI/CD** — infrastruktura jako kod w praktyce
+- **Raspberry Pi i AVR** — bo hardware też bywa ciekawy
+
+Nie obiecuję regularności — jeśli programowanie ma być pasją, samoprzymuszanie szybko prowadzi do zniechęcenia. Obiecuję natomiast, że każdy wpis będzie miał sens i konkretną wartość.

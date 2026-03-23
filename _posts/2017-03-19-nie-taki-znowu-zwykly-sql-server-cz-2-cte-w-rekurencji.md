@@ -1,18 +1,18 @@
 ---
-id: 50
-title: 'Nie taki znowu zwykły SQL Server cz. 2 – CTE w modelach hierarchicznych cd.'
+title: 'Nie taki znowu zwykły SQL Server cz. 2 – CTE w modelach hierarchicznych i rekurencji'
 date: '2017-03-19T18:00:51+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=50'
+layout: single
 permalink: /2017/03/19/nie-taki-znowu-zwykly-sql-server-cz-2-cte-w-rekurencji/
+series: "Nie taki znów zwykły SQL Server"
+excerpt: "Prawdziwa siła wyrażeń tablicowych tkwi w rekurencji. W tej części pokazuję, jak CTE obsługują modele hierarchiczne — drzewa i grafy — i jak w praktyce odpytywać struktury, które w zwykłym SQL wymagałyby zagnieżdżonych pętli."
 categories:
-    - 'Nie taki znów zwykły SQL'
+  - SQL Server
 tags:
-    - cte
-    - sql
-    - 'sql server'
-    - with
+  - sql
+  - sql-server
+  - cte
+  - rekurencja
+  - with
 ---
 
 Nadszedł czas na kontynuację naszej przygody z CTE. W poprzednim odcinku pokazałem jak bardzo wspólne wyrażenia tablicowe zbliżone są do podzapytań oraz jak można z nich korzystać. Wspomniałem też na samym początku, że pozwalają na obsługę modeli hierarchicznych z poziomu języka SQL, zatem postaram się nieco przybliżyć to zagadnienie.
@@ -27,7 +27,7 @@ W podobny sposób układają się np. katalogi i pliki w systemie operacyjnym, m
 
 Jak wspominałem na rynku dominuje model relacyjny i chcąc odzwierciedlić np. zależność między pracownikami musimy odwołać się do tabeli przechowującej pracownika:
 
-```
+```sql
 USE ShowCaseDb;
 GO
 
@@ -42,7 +42,7 @@ GO
 
 W takim przypadku naszym kluczem obcym będzie:
 
-```
+```sql
 ALTER TABLE BEINGS ADD FOREIGN KEY (EMPLOYER_ID) REFERENCES BEINGS;
 GO
 ```
@@ -50,7 +50,7 @@ GO
 Tak modelując takie rozwiązanie najsensowniej jest stworzyć relację w ramach tej samej tabeli.  
 Możemy załadować kilka przykładowych wierszy:
 
-```
+```sql
 INSERT INTO BEINGS(ID, NAME, EMPLOYER_ID) VALUES (1, 'Iluvatar', NULL);
 INSERT INTO BEINGS(ID, NAME, EMPLOYER_ID) VALUES (2, 'Morgoth', 1);
 INSERT INTO BEINGS(ID, NAME, EMPLOYER_ID) VALUES (3, 'Manwe', 1);
@@ -68,7 +68,7 @@ INSERT INTO BEINGS(ID, NAME, EMPLOYER_ID) VALUES (14, 'Aragorn', 9);
 
 Teraz chcąc np. wybrać wszystkie istoty podległe Iluvatarowi, możemy wywołać zapytanie:
 
-```
+```sql
 -- Chcąc wydobyć wszystkich podwładnych danej istoty musimy skorzystać z EMPLOYER_ID
 SELECT * FROM BEINGS where EMPLOYER_ID = (SELECT TOP 1 ID FROM BEINGS WHERE NAME = 'Iluvatar' )
 ```
@@ -77,21 +77,21 @@ SELECT * FROM BEINGS where EMPLOYER_ID = (SELECT TOP 1 ID FROM BEINGS WHERE NAME
 
 Chyba nie do końca o to nam chodziło… Interesują nas nie tylko bezpośredni podwładni, ale wszyscy. Możemy próbować rozbudowywać to zapytanie o kolejne poziomy, ale wydaje się to drogą ku zatraceniu.
 
-```
+```sql
 SELECT * FROM BEINGS where EMPLOYER_ID = (SELECT TOP 1 ID FROM BEINGS WHERE NAME = 'Iluvatar' )
 UNION ALL
 SELECT * FROM BEINGS where EMPLOYER_ID IN (SELECT ID FROM BEINGS where EMPLOYER_ID = (SELECT TOP 1 ID FROM BEINGS WHERE NAME = 'Iluvatar' ) )
--- UNION ALL 
--- 
+-- UNION ALL
+--
 ```
 
 [![](https://sgdev.pl/wp-content/uploads/2017/03/Zaznaczenie_008-300x167.png)](https://sgdev.pl/wp-content/uploads/2017/03/Zaznaczenie_008.png)
 
 Tutaj każda z baz proponuje swoje rozwiązanie (np. CONNECT BY autorstwa Oracle – swoją drogą całkiem przyjemna składnia), ale znam tylko jedne zgodne ze standardem języka SQL – właśnie użycie CTE. Ok, więc jak do tego podejść? Nie będę zdradzał rozwiązania od razu spróbujmy do tego dotrzeć do niego krok po kroku w naturalny sposób, a wyjdziemy zaczynając od błędnego kodu. Po tym krótkim spacerku mam nadzieję, że już nigdy nie będzie to dla was trudne.
 
-```
+```sql
 WITH BEINGS_OF_ARDA_TREE AS (
-    SELECT 1 as PLACE, * FROM BEINGS WHERE EMPLOYER_ID IS NULL 
+    SELECT 1 as PLACE, * FROM BEINGS WHERE EMPLOYER_ID IS NULL
     UNION ALL
     SELECT 2 as PLACE, * FROM BEINGS where EMPLOYER_ID in (SELECT TOP 1 ID FROM BEINGS WHERE EMPLOYER_ID IS NULL )
     UNION ALL
@@ -105,9 +105,9 @@ SELECT * FROM BEINGS_OF_ARDA_TREE
 
 Zauważyliście, że dodałem kolumnę PLACE mówiącą na którym poziomie hierarchii jesteśmy? Druga rzecz, która powinna zwrócić waszą uwagę to to, że z każdym kolejnym wierszem dodajemy jakby jeden poziom. Ostatnie najważniejsze spostrzeżenie jakie się nasuwa to, że każde zapytanie poza pierwszym uwzględnia wynik zapytania wcześniejszego. A czy… zamiast składni WHERE… IN… nie możnaby użyć złączenia z już przygotowanym wyrażeniem tablicowym ?
 
-```
+```sql
 WITH BEINGS_OF_ARDA_TREE AS (
-    SELECT 1 as PLACE, * FROM BEINGS WHERE EMPLOYER_ID IS NULL 
+    SELECT 1 as PLACE, * FROM BEINGS WHERE EMPLOYER_ID IS NULL
     UNION ALL
     SELECT ba.PLACE+ 1  as PLACE, b.* FROM BEINGS b INNER JOIN BEINGS_OF_ARDA_TREE ba on ba.ID = b.EMPLOYER_ID --łączymy z samym sobą(!)
 )
@@ -118,9 +118,9 @@ SELECT * FROM BEINGS_OF_ARDA_TREE
 
 BINGO! Chciałoby się zakrzyknąć. Czy w takim razie dałoby się zbudować tą hierarchię w druga stronę ? Np. poczynając od Sama przejść, aż po Iluvatara ? Żaden problem:
 
-```
+```sql
 WITH BEINGS_OF_ARDA_TREE AS (
-    SELECT 1 as PLACE, * FROM BEINGS WHERE NAME = 'Sam' 
+    SELECT 1 as PLACE, * FROM BEINGS WHERE NAME = 'Sam'
     UNION ALL
     SELECT ba.PLACE+ 1  as PLACE, b.* FROM BEINGS b INNER JOIN BEINGS_OF_ARDA_TREE ba on b.ID = ba.EMPLOYER_ID
 )

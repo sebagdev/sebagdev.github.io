@@ -1,13 +1,19 @@
 ---
-id: 227
-title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania cz. 6. – Terraform'
+title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania – cz. 6: Terraform'
 date: '2020-11-24T21:55:35+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=227'
+layout: single
 permalink: /2020/11/24/platformy-paas-jako-narzedzie-do-szybkiego-prototypowania-cz-6-terraform/
+series: "Platformy PaaS jako narzędzie do szybkiego prototypowania"
+excerpt: "Koniec z klikaniem w portalu Azure — czas na Infrastrukturę jako Kod. Terraform pozwala zdefiniować całą infrastrukturę w plikach tekstowych i zarządzać nią jak kodem. Praktyczny przykład dla Azure."
 categories:
-    - 'Bez kategorii'
+  - Cloud
+tags:
+  - cloud
+  - azure
+  - terraform
+  - iac
+  - paas
+  - devops
 ---
 
 W poprzednich częściach cyklu przeszliśmy szybką drogę do stworzenia aplikacji mobilnej w oparciu o Azure App Service. Wszystkie przykłady przedstawiałem w oparciu o interfejs graficzny, którego intuicyjność pozwala poznać ogrom możliwości chmury. W pewnych okolicznościach wyklikiwanie wszystkiego może okazać się niepraktyczne, a co gorsza może prowadzić do poważnych błędów.
@@ -22,7 +28,7 @@ Czy dałoby się jednak uniknąć przechowywania stanu? Cóż w pewnych scenariu
 
 Spróbujmy przejść od tej suchej teorii do praktyki. Do utworzenia zasobów w Azure będzie nam potrzebny provider azurerm. Sprobujmy też przygotować dedykowaną grupę zasobów:
 
-```
+```hcl
 provider "azurerm" {
   version = "~> 2.1.0"
   features {}
@@ -37,14 +43,14 @@ resource "azurerm_resource_group" "example" {
 
 Aby zaaplikować zmiany powinniśmy wykonać:
 
-```
+```bash
 % terraform plan
 % terraform apply
 ```
 
 Przetworzenie całości trochę potrwa i powinniśmy być zalogowani za pomocą lokalnego klienta Azure dostępnego na wszystkie platformy (<https://docs.microsoft.com/pl-pl/cli/azure/install-azure-cli>). Do tak utworzonego pliku możemy przygotować definicję planu usługi określawjącą typ i rodzaj zasobów konsumowanych przez naszą aplikację:
 
-```
+```hcl
 resource "azurerm_app_service_plan" "test" {
   name                = "example-appserviceplan"
   location            = "${azurerm_resource_group.example.location}"
@@ -66,7 +72,7 @@ Oczywiście po edycji pliku terraform ponownie wykonujemy polecenia plan i apply
 
 Po zdefiniowaniu planu przyszedł czas na przygotowanie usługi, która będzie z nego korzystać i pomieści naszą aplikację. Poniższe linijki mieszczą właściwie wszystkie ekrany związane z konfiguracją naszej aplikacji, a także musiały się w niej znaleźć zmienne środowiskowe przechowujące wszystkie sekrety. O tym w jaki sposób powinniśmy zarządzać sekretami opowiemy sobie w innym artykule tego cyklu.
 
-```
+```hcl
 resource "azurerm_app_service" "main" {
   name                = "sg-blog-appservice"
   location            = "${azurerm_resource_group.example.location}"
@@ -100,14 +106,14 @@ resource "azurerm_app_service" "main" {
 
 Kiedy podejmiemy próbę aplikacji zmian okaże się że nasz kod jest niepoprawny:
 
-```
+```bash
 Error: Reference to undeclared input variable
 
 ```
 
 Oczywiście zmienne które zdefiniowaliśmy powinniśmy gdzieś zadeklarować. Utarło się że zmienne w terraform powinno umieścić się w plikach **variables.tf** lub **vars.tf**. Deklaracja wszystkich zmiennych wygląda w zbliżony sposób jak w innych językach programowania, a dobry opis ułatwia zarządzanie nimi.
 
-```
+```hcl
 variable "marvel_privateKey" {
   description = "marvel_privateKey"
   type        = string
@@ -151,12 +157,12 @@ variable "docker_registry_server_password" {
 
 Po dodaniu powyższych definicji przy próbie wykonania planu pojawi się ładne zapytanie o kolejne wartości:
 
-```
-% terraform plan     
+```bash
+% terraform plan
 var.database_url
   DATABASE_URL as stated in Heroku
 
-  Enter a value: 
+  Enter a value:
 
 ```
 

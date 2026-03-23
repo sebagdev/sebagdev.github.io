@@ -1,16 +1,20 @@
 ---
-id: 190
-title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania cz. 4. – Azure App Service'
+title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania – cz. 4: Azure App Service cd.'
 date: '2020-11-14T12:24:01+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=190'
+layout: single
 permalink: /2020/11/14/platformy-paas-jako-narzedzie-do-szybkiego-prototypowania-cz-4-azure-app-service/
+series: "Platformy PaaS jako narzędzie do szybkiego prototypowania"
+excerpt: "Rozbudowa aplikacji na Azure App Service — zmienne środowiskowe, monitorowanie, skalowanie i integracja z Azure Container Registry. Jak zautomatyzować cały cykl deploy przez GitLab CI/CD."
 categories:
-    - Azure
-    - Cloud
-    - Docker
-    - Java
+  - Cloud
+tags:
+  - cloud
+  - azure
+  - azure-app-service
+  - java
+  - docker
+  - gitlab-ci
+  - paas
 ---
 
 Zanim ruszymy dalej z artykułami chmurowymi, krótkie ostrzeżenie -korzystając z AWS, czy Azure powinniśmy pamiętać, że subskrybujemy usługi płatne – do założenia konta potrzebna jest karta debetowa lub kredytowa (i niestety wszelkiego rodzaju prepaidy odpadają). Dodatkowo wiele oferowanych usług klasy Enterprise po prostu kosztuje krocie, należy więc za każdym razem sprzątać testowane przez nas usługi i kontrolować koszty. Powinniśmy też zadbać o ochronę naszego konta i dostępu do zasobów tj. włączyć MFA, chronić tokeny, stosować zasadę minimalnych uprawnień itd.  

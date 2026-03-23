@@ -1,17 +1,17 @@
 ---
-id: 82
-title: 'WeeklyJavaSnippets#1 Splitting and joining Strings in Java'
+title: 'Java Snippets #1 – dzielenie i łączenie Stringów'
 date: '2017-03-17T20:00:13+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=82'
+layout: single
 permalink: /2017/03/17/javasnippets-1-splitting-and-joining/
+series: "Java Snippets"
+excerpt: "Jak dzielić i łączyć Stringi w Javie? Przegląd dostępnych metod — od podstawowego split(), przez String.join(), aż po bibliotekę Guava. Małe rzeczy, wielka różnica w czytelności kodu."
 categories:
-    - 'Java Snippets'
+  - Java
 tags:
-    - guava
-    - java
-    - snippet
+  - java
+  - string
+  - guava
+  - snippet
 ---
 
 Wpadłem na pomysł kolejnego cyklu, który mógłby się przewijać na tym blogu, stanowiącego zbiór krótkich kawałków kodu czasem oczywistych, czasem nie, które… robią swoją robotę. Czy kiedykolwiek czułeś, że wynajdujesz koło po raz n-ty? Czy pozornie prosta operacja to kolejne i kolejne linijki kodu? Wezwij Drużynę A… Wybaczcie zapędziłem się. Po prostu zerknij na Java Snippets! A zatem nie przeciągając…
@@ -20,7 +20,7 @@ Wpadłem na pomysł kolejnego cyklu, który mógłby się przewijać na tym blog
 
 Założę się, że nie raz zazdrościliście Pythonowi:
 
-```
+```python
 >>> lst = ["Ania", "Basia", "Czesia"]
 >>> dziewczyny = ",".join(lst)
 >>> print(dziewczyny)
@@ -31,7 +31,7 @@ Ania,Basia,Czesia
 
 Programując w Javie w mrocznych czasach Javy 6 i 7, nie było tak różowo:
 
-```
+```java
 public static String myjoin(Iterable<String> iterable, String delimeter){
     StringBuilder sb = new StringBuilder();
     for (String s : iterable){
@@ -55,7 +55,7 @@ public static void main(String[] args){
 
 Tak brakowało prostego joina, a więc każdy projekt musiał mieć dodatkową bibliotekę lub własną koślawą implementację. Sytuacja zmieniła się po nadejściu Javy 8 (fanfary):
 
-```
+```java
 public static void main1(String[] args){
     // Java 8 - style
     List<String>  lst = Arrays.asList("Ania", "Basia", "Czesia");
@@ -69,7 +69,7 @@ Myślę, że wielu Javowców odetchnęło wtedy z ulgą, ale chciałem napisać 
 
 A co oferuje w zakresie rozdzielania i łączenia Stringów ?
 
-```
+```java
 List<String>  lst = Arrays.asList("Ania", "Basia", "Czesia");
 String dziewczyny = Joiner.on(',').join(lst);  // Joining Guava style
 System.out.println(dziewczyny);
@@ -78,7 +78,7 @@ System.out.println(Splitter.on(",").splitToList(dziewczyny));
 
 Co istotne poradzi sobie także w bardziej nietypowych sytuacjach, gdy dane są nieco zanieczyszczone nullami lub pustymi Stringami, za pomocą eleganckiego płynnego API konstruując obiekt obsługujący nawet nasz bardziej skomplikowany przypadek:
 
-```
+```java
 public static void main(String[] args){
     List<String>  lst = Arrays.asList("Ania", "", "Basia   ", null, "Czesia   ");
     String dziewczyny = Joiner.on(',').skipNulls().join(lst);  // Joining Guava style
@@ -87,8 +87,8 @@ public static void main(String[] args){
 }
 ```
 
-```
-Ania,,Basia   ,Czesia   
+```text
+Ania,,Basia   ,Czesia
 [Ania, Basia, Czesia]
 ```
 

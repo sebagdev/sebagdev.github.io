@@ -1,0 +1,13 @@
+main:
+  - title: "Blog"
+    url: /
+  - title: "Kategorie"
+    url: /categories/
+  - title: "Tagi"
+    url: /tags/
+  - title: "Archiwum"
+    url: /archive/
+  - title: "O autorze"
+    url: /o-autorze/
+  - title: "O blogu"
+    url: /o-blogu/

@@ -1,0 +1,19 @@
+{% if page.series %}
+  {% assign series_posts = site.posts | where: "series", page.series | sort: "date" %}
+  {% if series_posts.size > 1 %}
+<div class="notice--info">
+  <h4>Seria: {{ page.series }}</h4>
+  <ol>
+    {% for post in series_posts %}
+      <li>
+        {% if post.url == page.url %}
+          <strong>{{ post.title }}</strong> &larr; jesteś tutaj
+        {% else %}
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</div>
+  {% endif %}
+{% endif %}

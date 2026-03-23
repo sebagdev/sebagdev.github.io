@@ -1,23 +1,34 @@
 ---
-id: 11
-title: 'O autorze'
-date: '2017-03-06T17:11:05+01:00'
-author: sg
-layout: page
-guid: 'http://sgdev.pl/?page_id=11'
+title: "O autorze"
+layout: single
+permalink: /o-autorze/
+author_profile: true
 ---
 
-### Praca i zainteresowania branżowe
+## Kim jestem
 
-Określam się jako programista – pasjonat, od kilku lat zajmuję się wdrażaniem rozwiązań z zakresu JEE, z obszaru systemów ECM i BPM opartych o JSF i JBPM. Wspomagająco narzędziowo pracę często ułatwia mi Python, którego zasadniczo czuję wieczny niedosyt.
+Nazywam się Sebastian Gabor. Jestem programistą z wieloletnim doświadczeniem w ekosystemie JVM, z pasją do czystego kodu, dobrej architektury i narzędzi DevOps.
 
-Prywatnie jestem zainteresowany ciągłym rozwojem w olbrzymim ekosystemie Javy, szczególnie spoglądając w stronę Spring’a oraz coraz powszechniejszej architektury opartej o mikroserwisy.
+Zawodowo pracuję głównie z **Javą** i **Spring Boot**, budując systemy backendowe — od klasycznych aplikacji webowych, przez REST API, aż po systemy oparte o mikroserwisy. Bliskie mi są tematy ECM, BPM i integracji systemów.
 
-Moja wielka niespełniona miłość z czasów studenckich tj. Ruby i RoR spowodowała ogromną obecną fascynację JHipsterem <https://jhipster.github.io/>
+Chmura to mój drugi żywioł — **Azure** i narzędzia takie jak **Terraform** stały się stałymi elementami mojej pracy i hobbystycznych projektów.
 
-### Poza IT
+**Python** to moja niespełniona miłość — wraca regularnie przy automatyzacji, skryptach i wszelkich zadaniach, gdzie liczy się szybkość prototypowania.
 
-Dobra książka, seriale.  
-Fan klimatów postapo.  
-Geocaching i odwiedzanie nowych miejsc.  
-Bieganie, jazda na rowerze, pływanie, wędrówki górskie.
+## Tech stack
+
+- **Backend:** Java 17+, Spring Boot, Spring WebFlux, JPA/Hibernate
+- **Cloud & DevOps:** Azure (App Service, PostgreSQL, AKS), Terraform, GitLab CI/CD, Docker
+- **Bazy danych:** PostgreSQL, MS SQL Server
+- **Narzędzia:** Maven, Git, IntelliJ IDEA
+- **Hobbystycznie:** Python, mikrokontrolery AVR, Raspberry Pi
+
+## Poza IT
+
+Dobra książka i ulubione seriale — klimat postapo szczególnie w cenie.
+
+Geocaching, wędrówki górskie, bieganie, rower i pływanie — ruch jest ważny, zwłaszcza przy siedzącym trybie pracy.
+
+## Kontakt
+
+Najłatwiej złapać mnie przez [GitHub](https://github.com/sebagdev) lub [Twitter/X](https://twitter.com/sebagabor).

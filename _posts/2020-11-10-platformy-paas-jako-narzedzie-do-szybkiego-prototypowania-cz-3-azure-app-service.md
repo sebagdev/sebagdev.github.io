@@ -1,16 +1,19 @@
 ---
-id: 177
-title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania cz. 3. &#8211; Azure App Service'
+title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania – cz. 3: Azure App Service'
 date: '2020-11-10T19:50:05+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=177'
+layout: single
 permalink: /2020/11/10/platformy-paas-jako-narzedzie-do-szybkiego-prototypowania-cz-3-azure-app-service/
+series: "Platformy PaaS jako narzędzie do szybkiego prototypowania"
+excerpt: "Przenosimy się na Azure. Azure App Service jako platforma dla kontenerów Dockerowych — pierwsze kroki, konfiguracja resource group, App Service Plan i wdrożenie aplikacji Spring Boot z GitLab."
 categories:
-    - 'Bez kategorii'
-    - Cloud
-    - Docker
-    - Java
+  - Cloud
+tags:
+  - cloud
+  - azure
+  - azure-app-service
+  - java
+  - docker
+  - paas
 ---
 
 W poprzednim artykułach opisywałem Heroku, który idealnie pokrywa przypakdi hobbystyczne, co jednak kiedy chcemy przeprowadzić pewien mniej lub bardziej zaawansowany proof-of-concept w firmie, a management nie specjalnie ma ochotę na zawieranie nowych umów i sugeruje skorzystanie z już posiadanych przez nas subskrybcji.
@@ -31,14 +34,14 @@ Jest to rodzaj wirtualizacji na poziomie systemu operacyjnego (OS-level virtuali
 
 Obraz Dockerowy można złożyć z kilku warstw za pomocą kilku wbudowanych poleceń takich jak FROM, CMD, COPY, ARG. Dla przykładu:
 
-```
+```dockerfile
 FROM ubuntu:18.04
 CMD echo "lipa"
 ```
 
 Po utworzeniu pliku Docker file jw. zbudowanie obrazu i uruchomienie kontenera sprowadza się do dwóch poleceń:
 
-```
+```bash
 % docker build -t hellow .
 Sending build context to Docker daemon   43.7MB
 Step 1/2 : FROM ubuntu:18.04
@@ -63,7 +66,7 @@ lipa
 
 W przypadku naszej aplikacji moglibyśmy wyodrębnić całą logikę poprzez przekopiowanie utworzonych artefaktów w następujący sposób:
 
-```
+```dockerfile
 FROM openjdk:14-jdk-alpine
 RUN addgroup -S marvelaggregator && adduser -S marvelaggregator -G marvelaggregator
 USER marvelaggregator:marvelaggregator
@@ -75,7 +78,7 @@ ENTRYPOINT ["java","-jar","/app.jar"]
 W zasadzie poza skopiowaniem artefaktów i uruchomieniem naszej aplikacji zmieniamy jeszcze kontekst użytkownika na pozbawionego przywilejów ROOT’a (dobra praktyka).  
 Po próbie budowy, możemy niestety zaobserwować dość nieprzyjemny wyjątek:
 
-```
+```bash
 % docker build -t sgdevpl/marvelapp .
 % docker run sgdevpl/marvelapp:latest
 % .....
@@ -88,7 +91,7 @@ Caused by: java.lang.IllegalArgumentException: Could not resolve placeholder 'DA
 W dość wymowny sposób pokazuje o czym zapomnieliśmy podczas uruchamiania/tworzenia obrazu.   
 Do uruchomienia potrzebujemy kilku dodatkowych zmiennych środowiskowych – w końcu w Heroku użyliśmy aż pięciu (!). Powinny one zostać przekazane do kontenera. Przygotujmy zatem plik w następującym formacie:
 
-```
+```text
 DATABASE_URL=postgres://dbuser:dbpass@ec2-11-11-11-11.eu-west-1.compute.amazonaws.com:5432/dfdbf
 marvelclient_privateKey=123456abcdef.....
 marvelclient_publicKey=43567890abcdef....
@@ -102,14 +105,14 @@ Czy projektując aplikację nie pod konkretnego dostawcę podjęlibyśmy identyc
 Zapewne zależałoby nam na rozdzieleniu pewnych elementów, dodatkowo moglibyśmy uniknąć zaprezentowanego wcześniej hack’a.  
 Kolejna próba z uwzględnieniem zmiennych środowiskowych i przekierowaniem portów pozwala już na lokalne uruchomienie skonteneryzowanej aplikacji:
 
-```
+```bash
 % docker run --env-file ./env.list -p 8080:8080  sgdevpl/marvelapp:latest
 ```
 
 Teraz wypadałoby poszerzyć nasz projekt o budowanie obrazu w pipelinie. Na szczęście przy oparciu naszego amatorskiego projektu o Gitlaba uzyskaliśmy możliwość skorzystania z ichniejszego rejestru obrazów (rozmiar całego repozytorium jak i rejestru posiada ograniczenie 10GB).  
 Użycie pipeline’ów w Gitlab sprawia, że uzyskanie do niego dostępu również jest banalnie proste poprzez predefiniowane zmienne:
 
-```
+```yaml
 docker-build:
   stage: dockerize
   variables:
@@ -124,7 +127,7 @@ docker-build:
 
 Przygotowany etap wykonuje budowanie obrazu przy założeniu, że wcześniej odłożyliśmy je:
 
-```
+```yaml
 build:
   image: maven:3.6.3-jdk-14
   stage: build
@@ -140,7 +143,7 @@ Po uruchomieniu kilku pipeline’ów zobaczymy, że rejestr zapełnia się kolej
 
 Można dodać do pipeline’u kolejny etap, którego celem będzie wykonanie właśnie tej operacji tj. odpowiednie tagowanie ostatniego build’a.
 
-```
+```yaml
 deploy (Azure):
   stage: deploy latest
   variables:

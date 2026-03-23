@@ -1,18 +1,17 @@
 ---
-id: 54
-title: 'ZeroTurnaround cheatsheets &#8211; nie tylko dla Javowców'
+title: 'ZeroTurnaround cheatsheets – nie tylko dla Javowców'
 date: '2017-03-15T18:00:46+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=54'
+layout: single
 permalink: /2017/03/15/zeroturn-around-cheatsheets-nie-tylko-dla-javowcow/
+excerpt: "ZeroTurnaround publikuje doskonałe cheatsheets dla programistów — Java, Git, SQL i więcej. Zbiór ściągawek, które warto mieć pod ręką niezależnie od używanej technologii."
 categories:
-    - 'Bez kategorii'
+  - Narzędzia
 tags:
-    - git
-    - java
-    - sql
-    - ZeroTurnAround
+  - java
+  - git
+  - sql
+  - cheatsheet
+  - zeroturnAround
 ---
 
 Zapewne większość z was kojarzy firmę ZeroTurnaround – to twórcy świetnego narzędzia JRebel, pozwalającego na przeładowywanie kodu w locie, co znacząco pomaga przy pracy z cięższymi projektami. W zasadzie największą wadą tego rozwiązania były koszty licencji, jednak kto pracował, ten miał okazję docenić, gdy nie musiał czekać X minut na cały redeploy aplikacji.. Ale nie o tym i nie jest wpis sponsorowany 🙂 Chłopaki i dziewczyny z ZT na swoim blogu wrzucają fajne skrótowe cheatsheety, które mogą przydać się każdemu z was:

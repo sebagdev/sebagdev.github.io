@@ -1,20 +1,27 @@
 ---
-id: 259
-title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania cz. 8. – zarządzanie infrastrukturą z poziomu GitLab'
+title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania – cz. 8: zarządzanie infrastrukturą z poziomu GitLab'
 date: '2020-11-30T18:49:07+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=259'
+layout: single
 permalink: /2020/11/30/platformy-paas-jako-narzedzie-do-szybkiego-prototypowania-cz-8-zarzadzanie-infrastruktura-z-poziomu-gitlab/
+series: "Platformy PaaS jako narzędzie do szybkiego prototypowania"
+excerpt: "Finał serii — zamykamy pętlę i pozwalamy GitLab CI/CD zarządzać nie tylko kodem, ale i infrastrukturą. Service Principal, pipeline Terraformowy i pełna automatyzacja od commita do chmury."
 categories:
-    - 'Bez kategorii'
+  - Cloud
+tags:
+  - cloud
+  - azure
+  - terraform
+  - gitlab-ci
+  - iac
+  - devops
+  - paas
 ---
 
 W poprzednich częściach pokazaliśmy jak możemy w naszej prototypowanej aplikacji szybko zbudować pełny pipeline CI/CD. Następnie udało nam się przeprowadzić deployment na chmurach Heroku i Azure, oraz cały kod przedstawić w postaci Terraformowego skryptu o stanie współdzielonym w zewnętrznym magazynie. Moglibyśmy teraz ruszyć o krok dalej, pozwalając naszemu repozytorium nie tylko zarządzać kodem, ale też dbać o aplikowanie zmian w chmurze.
 
 W celu użycia nie-personalnego konta i posiadania pewnej kontroli nad tworzoną aplikacją powinniśmy utworzyć dedykowaną jednostkę usługi (Service Principal). Na potrzeby artykułu możemy traktować ją jako rodzaj niespersonalizowanej tożsamości.
 
-```
+```bash
 % az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/{SubscribtionID}"
 Creating a role assignment under the scope of "/subscriptions/<SubscriptionID>"
   Retrying role assignment creation: 1/36
@@ -31,7 +38,7 @@ Przypisanie jednostce usługi roli „Contributor” pozwoli jej na zarządzanie
 
 Następnie możemy przygotować zarys Pipeline’u (.gitlab-ci.yml), którego ogólna idea pozwoli na przygotowanie i przetestowanie zmian w infrastrukturze naszego projektu.
 
-```
+```yaml
 image:
   name: hashicorp/terraform:0.13.5
 before_script:
@@ -73,7 +80,7 @@ Zatem począwszy od zmiennych aplikacyjnych TF\_VARS\_\* możemy rozpocząć prz
 
 Przy próbie wywołania zadania planowania nawet po ustawieniu zmiennych, możemy zobaczyć następujący błąd:
 
-```
+```bash
 Error: Error building AzureRM Client: Azure CLI Authorization Profile was not found. Please ensure the Azure CLI is installed and then log-in with `az login`.
 ```
 

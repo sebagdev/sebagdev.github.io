@@ -1,17 +1,17 @@
 ---
-id: 115
-title: 'AVR + Raspberry PI = ?'
+title: 'AVR + Raspberry Pi = ?'
 date: '2017-04-02T21:00:39+02:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=115'
+layout: single
 permalink: /2017/04/02/avr-raspberry-pi/
+excerpt: "Co się dzieje, gdy podłączymy mikrokontroler AVR do Raspberry Pi? Praktyczny eksperyment z komunikacją między światem embedded a Linuxem — okablowanie, kod w C i pierwsze wyniki."
 categories:
-    - 'Raspberry PI'
+  - Hardware
 tags:
-    - avr
-    - C
-    - 'raspberry pi'
+  - avr
+  - c
+  - raspberry-pi
+  - mikrokontrolery
+  - embedded
 ---
 
 #### Grzebanie w starociach
@@ -22,7 +22,7 @@ Ostatnio przegrzebywałem się przez moje szuflady z elektroniką w poszukiwaniu
 
 Po chwilę wpadło mi ręce jeszcze kilka podobnych, lecz niestety mój programator USB zaginął w akcji jakiś czas temu, Arduino nigdy nie posiadałem, a współczesne komputery nie mają już ani RS232 ani Centronics. Rozczarowany już przerzucałem je do pudełka, gdy me oczy spoczęły na… malince. Tak głupcze! Porty GPIO powinny się nadać. Zanurkowałem w internety jak do tego podejść. Avrdude… no jasne to powinno zadziałać! Niestety brak paczki w repo raspbiana oznaczał kompilację ze źródeł.
 
-```
+```bash
 $ sudo apt-get install bison flex -y
 $ wget http://download.savannah.gnu.org/releases/avrdude/avrdude-6.2.tar.gz
 $ tar zxvf avrdude-6.2.tar.gz 
@@ -34,7 +34,7 @@ $ sudo make install
 
 Make, trochę potrwał z uwagi, że kompilowaliśmy paczkę na malince. Dodatkowo w pliku/usr/local/etc/avrdude.conf konieczne były małe zmiany konfiguracyjne. Odkomentowanie sekcji z linuxgpio i ustawienie odpowiednich pin’ów.
 
-```
+```text
   id    = "linuxgpio";
   desc  = "Use the Linux sysfs interface to bitbang GPIO lines";
   type  = "linuxgpio";
@@ -60,7 +60,7 @@ Czyli podsumowując połączyłem jak niżej:
 
 Przyszła pora na pogadanie z mikrokontrolerem:
 
-```
+```bash
 $ sudo avrdude -c linuxgpio -p attiny2313 -v
 
 avrdude: Version 6.2, compiled on Mar 25 2017 at 17:13:29
@@ -131,7 +131,7 @@ Hurra! 🙂 Czym by był mój eksperyment, gdybym nie próbował zamrugać diod�
 
 Napisałem krótki programik, jako ofiarę wybrałem sobie PIN6 z portu D, gdyż był wygodnie usytuowany. Podpiąłem diodę led i rezystor 1kOhm.
 
-```
+```c
 #include<avr/io.h>
 #include<util/delay.h>
 
@@ -148,7 +148,7 @@ int main(void){
 
 Nastepnie kolejno skompilowałem napisany kod, utworzyłem plik do wgrania na malinkę, i za pomocą avrdude przesłałem wszystko na malinę.
 
-```
+```bash
 $ avr-gcc -mmcu=at90s2313 test.c -o test
 $ avr-objcopy -O ihex  test test.hex
 $ sudo avrdude -c linuxgpio -p attiny2313 -v -U flash:w:test.hex:i
@@ -156,7 +156,7 @@ $ sudo avrdude -c linuxgpio -p attiny2313 -v -U flash:w:test.hex:i
 
 Avr dude wyświetlił podsumowanie:
 
-```
+```bash
 $ sudo avrdude -c linuxgpio -p attiny2313 -v -U flash:w:test.hex:i
 
 avrdude: Version 6.2, compiled on Mar 25 2017 at 17:13:29

@@ -1,16 +1,17 @@
 ---
-id: 76
-title: 'Nie taki znów zwykły SQL Server cz. 3 &#8211; Merge czyli po prostu UPSERT'
+title: 'Nie taki znów zwykły SQL Server cz. 3 – MERGE czyli po prostu UPSERT'
 date: '2017-03-27T18:00:40+02:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=76'
+layout: single
 permalink: /2017/03/27/merge-czyli-po-prostu-upsert/
+series: "Nie taki znów zwykły SQL Server"
+excerpt: "MERGE to jedna z najbardziej niedocenianych instrukcji w SQL Server. Pozwala wykonać INSERT, UPDATE i DELETE w jednym zapytaniu na podstawie warunku dopasowania — czyli UPSERT z prawdziwego zdarzenia."
 categories:
-    - 'Nie taki znów zwykły SQL'
+  - SQL Server
 tags:
-    - sql
-    - 'sql server'
+  - sql
+  - sql-server
+  - merge
+  - upsert
 ---
 
 #### Merge, upsert – o co chodzi ?
@@ -23,7 +24,7 @@ Merge ? Nigdy tego nie używałem, z tego w ogóle się korzysta ?! Mniej więce
 
 Wyobraźmy sobie, że mamy przestarzały system zgłoszeniowy, którego statusów potrzebuje nasza aplikacja (np. do wyświetlenia). Oczywiście ten stary system wciąż działa, zatem co jakiś czas muszą przychodzić aktualizacje.
 
-```
+```sql
 USE ShowCaseDb;
 
 -- Stwórzmy tabelkę reprezentującą dane z systemu zgłoszeniowego
@@ -47,7 +48,7 @@ INSERT INTO LS_TICKETS (TICKET_NO,TICKET_ASSIGNEE,TICKET_STATUS)
 
 Normalną i częstą praktyką jest, że dane przychodzące z zewnętrznego systemu lądują nie od razu w docelowej tabeli, z której korzysta aplikacja, ale z tabeli pośredniej (staging’owej) z której dopiero są ładowane do tabeli roboczej. Przykładowo szyna integracyjna przysyła nam nową partię danych:
 
-```
+```sql
 -- Nie zapomnijmy o przygyotowaniu sobie wcześniej tabeli :)
 CREATE TABLE LS_TICKETS_STAGING (
     ID INT IDENTITY NOT NULL PRIMARY KEY, 
@@ -75,7 +76,7 @@ A tabela staging’owa z aktualizacjami wygląda mniej więcej tak:
 
 Chcąc wyrównać te dane standardową drogą powinniśmy. Napisać SELECT’a który znajdzie odpowiadające sobie wiersze, a następnie wykona UPDATE kolumn statusowych, a w przypadku gdy danego id nie ma na bazie zostanie wykonany INSERT. Trochę kodu do napisania przed nami… Otóż nie!
 
-```
+```sql
 MERGE INTO LS_TICKETS lt USING LS_TICKETS_STAGING lts ON (lt.TICKET_NO = lts.TICKET_NO) -- merge pozwala nam połączyć ze sobą dwie tabele
 WHEN MATCHED THEN -- w przypadku, gdy mamy odpowiadające sobie wiersze to wykonajmy update:
 UPDATE SET lt.TICKET_ASSIGNEE = lts.TICKET_ASSIGNEE, lt.TICKET_STATUS = lts.TICKET_STATUS 

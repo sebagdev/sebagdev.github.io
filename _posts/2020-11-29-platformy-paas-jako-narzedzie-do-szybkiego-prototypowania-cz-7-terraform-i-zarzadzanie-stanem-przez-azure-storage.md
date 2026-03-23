@@ -1,13 +1,20 @@
 ---
-id: 248
-title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania cz. 7. – Terraform i zarządzanie stanem przez Azure Storage'
+title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania – cz. 7: Terraform i zarządzanie stanem przez Azure Storage'
 date: '2020-11-29T13:46:24+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=248'
+layout: single
 permalink: /2020/11/29/platformy-paas-jako-narzedzie-do-szybkiego-prototypowania-cz-7-terraform-i-zarzadzanie-stanem-przez-azure-storage/
+series: "Platformy PaaS jako narzędzie do szybkiego prototypowania"
+excerpt: "Lokalny stan Terraform to problem bezpieczeństwa — sekrety lądują w tfstate czystym tekstem. Rozwiązanie: Azure Storage jako backend dla stanu. Przeniesienie stanu i security best practices w praktyce."
 categories:
-    - 'Bez kategorii'
+  - Cloud
+tags:
+  - cloud
+  - azure
+  - terraform
+  - azure-storage
+  - iac
+  - security
+  - devops
 ---
 
 Obiecałem w poprzednich rozdziałach, że zadbamy o lekkie usprawnienia security. Lokalny stan w terraform, nie stanowi najlepszego rozwiązania wystarczy, że podejrzymy wygenerowane pliki .tfstate i niezależnie od sposobu przekazania sekretów – lądują one tam czystym tekstem. Dodatkowo jeśli więcej niż jedna osoba pracuje nad zmianami infrastruktury – stan byłby ciągle trzymany niezależnie na różnych systemach. Potencjalnymi rozwiązaniami tego problemu mógłby być wspóldzielony dysk lub nawet lepiej inny rodzaj bezpiecznego składowiska.
@@ -16,14 +23,14 @@ Obiecałem w poprzednich rozdziałach, że zadbamy o lekkie usprawnienia securit
 
 W tym artykule omówimy sobie podejście wykorzystujące Azure Storage. Zaczynamy od przygotowanie dedykowanej grupy zasobów, jak i konta magazynu (Storage account).
 
-```
+```bash
 % az group create --name terraform-state --location westeurope
 % az storage account create --resource-group terraform-state --name tstatesgdevpl --sku Standard_LRS --encryption-services blob
 ```
 
 Przygotowane w ten sposób konto magazynu da nam dostęp do stanu z każdego miejsca na świecie. Klucze dostępowe uzyskamy poprzez polecenie:
 
-```
+```bash
 % az storage account keys list --resource-group terraform-state --account-name tstatesgdevpl                           
 [
   {
@@ -44,13 +51,13 @@ Otóż… możemy korzystać z obu. Istnienie dwóch kluczy drastycznie ułatwia
 
 Pozyskany w ten sposób klucz dla potrzeb Terraform powinniśmy umieścić w zmiennej środowiskowej:
 
-```
+```bash
 export ARM_ACCESS_KEY=xxxxxxxx
 ```
 
 Następnie przygotowujemy magazyn pod nasz stan termaformowy.
 
-```
+```bash
 % az storage container create --name tstate-marvel-aggregator --account-name tstatesgdevpl --account-key $ARM_ACCESS_KEY
 {
   "created": true
@@ -64,7 +71,7 @@ Jeśli chcemy obejrzeć efekt powyższych działań możemy zajrzeć np. na Port
 Pozostał nam do ułożenia ostatni klocek naszej układanki. Powinniśmy przestawić domyślne zachowanie Terraform, aby potrafił skorzystać z przygotowanego składowiska.  
 Mechanizmy obsługujące zarządzanie stanem nazywane są „backendami” i są one w pełni konfigurowalne i podmienialne. Domyślne zachowanie i jego wady poznaliśmy w poprzednich artykułach, jednak ich podmiana okazuje się banalną sprawą – wykorzystuje się do tego specjalną sekcję na początku pliku (dodajmy ją do naszego config.tf):
 
-```
+```hcl
 terraform {
   backend "azurerm" {
     resource_group_name   = "terraform-state"

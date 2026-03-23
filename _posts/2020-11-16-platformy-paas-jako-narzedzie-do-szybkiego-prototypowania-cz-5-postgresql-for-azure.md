@@ -1,16 +1,19 @@
 ---
-id: 211
-title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania cz. 5. – PostgreSQL for Azure'
+title: 'Platformy PaaS jako narzędzie do szybkiego prototypowania – cz. 5: PostgreSQL for Azure'
 date: '2020-11-16T21:35:32+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=211'
+layout: single
 permalink: /2020/11/16/platformy-paas-jako-narzedzie-do-szybkiego-prototypowania-cz-5-postgresql-for-azure/
+series: "Platformy PaaS jako narzędzie do szybkiego prototypowania"
+excerpt: "Dodajemy bazę danych do naszej chmurowej aplikacji — Azure Database for PostgreSQL. Konfiguracja, połączenie z aplikacją Spring Boot, Spring Data JPA i zarządzanie migracjami w środowisku chmurowym."
 categories:
-    - Azure
-    - Cloud
-    - Docker
-    - Java
+  - Cloud
+tags:
+  - cloud
+  - azure
+  - postgresql
+  - java
+  - spring-boot
+  - paas
 ---
 
 W poprzedniej części naszego cyklu udało nam się z sukcesem przenieść naszą aplikację pod postacią obrazu Docker’owego na Azure. Jednak na Heroku wciąż pozostała baza danych, co sugeruje, że nasza migracja jest wciąż niepełna. W tym artykule chciałbym skupić się na postawieniu dedykowanej bazy danych w chmurze Microsoft’u.
@@ -32,13 +35,13 @@ Do dalszej konfiguracji konieczny już będzie klient psql, ale jeśli nie chcem
 ![](https://sgdev.pl/wp-content/uploads/2020/11/image-12-1024x36.png)
 Nie ma znaczenia czy dalszą konfigurację wykonamy z terminala, czy z przeglądarki, do połączenia potrzebujemy jednak klienta psql:
 
-```
+```bash
 % psql --host=<mój host>.postgres.database.azure.com --port=5432 --username=<mój admin>@<mój host> --dbname=postgres
 ```
 
 Następnie należy utworzyć kolejno bazę danych, rolę i odpowiednie przywileje:
 
-```
+```sql
 postgres=> CREATE DATABASE sgdevblog;
 CREATE DATABASE
 postgres=> CREATE ROLE sgdevblogger WITH LOGIN NOSUPERUSER INHERIT CREATEDB NOCREATEROLE NOREPLICATION PASSWORD '<moje hasło>';
@@ -49,7 +52,7 @@ GRANT
 
 Po utworzeniu nowej roli, możemy zaktualizować nasze połączenia. Przykładowy connection string będzie wyglądał następująco:
 
-```
+```text
 jdbc:postgresql://<nasza instancja bazy>.postgres.database.azure.com:5432/<baza danych>
 ```
 

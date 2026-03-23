@@ -1,25 +1,23 @@
 ---
-id: 58
-title: 'Widmo krąży po Javie&#8230; widmo boilerplate&#8217;u'
+title: "Widmo krąży po Javie... widmo boilerplate'u"
 date: '2017-03-12T19:00:15+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=58'
+layout: single
 permalink: /2017/03/12/widmo-krazy-po-javie-widmo-boilerplateu/
+excerpt: "Boilerplate w Javie to problem, który od lat frustruje programistów. Lombok to biblioteka, która eliminuje gettery, settery, konstruktory i wiele więcej za pomocą adnotacji — zerowy narzut, maksymalny efekt."
 categories:
-    - Java
+  - Java
 tags:
-    - .net
-    - boilerplate
-    - java
-    - lombok
+  - java
+  - boilerplate
+  - lombok
+  - czysty-kod
 ---
 
 #### Problem (?)
 
 W zasadzie ktokolwiek zajmujący się Javą, a mający w swoim życiorysie romans z platformą .NET przyzna, że Java nie jest zwięzłym językiem. Już sam kod akcesorów, które trzeba tworzyć/generować za każdym razem potrafi doskonale zaciemnić nam obraz klasy. Dla przykładu znany z konkurencyjnej platformy mechanizm Properties doskonale adresuje ten problem, skracając boilerplate do minimum, jak i pozostawia programistę w pełnej kontroli:
 
-```
+```java
 class Entity {
 
     public String Name {get; set;}
@@ -46,7 +44,7 @@ class Entity {
 
 Dla przykładu odpowiadający kawałek kodu w Javie:
 
-```
+```java
 public class Entity {
 
     private String name;
@@ -78,7 +76,7 @@ public class Entity {
 
 Kolejną rzeczą, na którą dość często tracimy czas jest „implementowanie” .equals() i .hashCode(). Doskonałym wsparciem w tym zakresie jest IDE – mamy rozbudowane możliwości generacji, jak i biblioteki, jednakże gdy przychodzi do utrzymania takiego kodu cóż… wtedy robi się mniej ciekawie. Dodajmy że przy większych encjach programista jest zmuszony do wpatrywania się w ścianę kodu, po czym no właśnie… pozostaje dylemat. *dodałem/usunąłem/zmieniłem pole, przegenerować to wszystko, ale zaraz czyż to nie jest jakieś paskudne legacy code? i co mam teraz z tym zrobić ? czemu właściwie te 10 testów eksplodowało ?*
 
-```
+```java
 // Classic style
 @Override
 public boolean equals(Object o) {
@@ -120,7 +118,7 @@ Powyżej zamieściłem dwa szybkie przykłady na najbardziej pospolity typ boile
 
 Drugie rozwiązanie któremu właściwie chciałem poświęcić ten artykuł jest [ProjectLombok](https://projectlombok.org/). Opiera się on podobnie jak i AutoValue o wykorzystanie adnotacji pozwalających na ograniczenie ilości kodu, jakie trzeba napisać/wygenerować. Biblioteka wstrzykuje podczas kompilacji opierając się o adnotacje kod i w zasadzie tyle. Warto zwrócić uwagę, że pozbawiony lomboka kod będzie niekompilowalny. Co do czytelności, myślę że sami osądzicie to po poniższym przykładzie – cały kod mieści się na jednym ekranie 🙂
 
-```
+```java
 @ToString(exclude = {"dontWantThisInToString"})
 @EqualsAndHashCode(exclude = {"dontWantThisInHashCode"})
 public class EntityLombok {
@@ -162,7 +160,7 @@ public class EntityLombok {
 
 Uruchomienie powyższej klasy spowoduje wypisanie następujących treści na konsolę:
 
-```
+```java
 Setting surname
 Accesing surname
 My name is: Testname TestsurnameAccesing surname
@@ -171,7 +169,7 @@ EntityLombok(name=Testname, surname=Testsurname, dontWantThisInHashCode=not want
 
 Jednakże jak ta magia jest możliwa ? Cóż… lombok.jar musi być dostępny w classpath. Ponadto musi być zainstalowana wtyczka do IDE (istnieją wtyczki do IntelliJ, Eclipse i Netbeans). Tylko dzięki temu z poziomu edytora będzie można skorzystać z wygenerowanych metod, a także (np. wybierając z Outline w Eclipse lub poprzez find usages z IntelliJ) wyszukać wszystkie miejsca użycia danej metody. Co ciekawe lombok posiada także wiele innych przydatnych rzeczy jak np. autoimplementacją wzorca Builder:
 
-```
+```java
 @Builder
 @ToString(exclude = {"dontWantThisInToString"})
 @EqualsAndHashCode(exclude = {"dontWantThisInHashCode"})
@@ -191,9 +189,9 @@ System.out.println(entityLombok);
 
 Co więcej można nawet wprowadzić nowe słowo kluczowe 🙂
 
-```
+```java
 val list = new ArrayList<String>();
-// stanie się odpowiednikiem: 
+// stanie się odpowiednikiem:
 final ArrayList<String> list = new ArrayList<String>();
 ```
 

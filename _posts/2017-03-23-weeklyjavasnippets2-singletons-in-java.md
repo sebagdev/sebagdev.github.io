@@ -1,18 +1,18 @@
 ---
-id: 97
-title: 'WeeklyJavaSnippets#2 Singletons in Java'
+title: 'Java Snippets #2 – Singletony w Javie'
 date: '2017-03-23T20:00:00+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=97'
+layout: single
 permalink: /2017/03/23/weeklyjavasnippets2-singletons-in-java/
+series: "Java Snippets"
+excerpt: "Singleton to jeden z najczęściej stosowanych wzorców GoF, ale też jeden z najczęściej źle implementowanych. Przegląd podejść: od prostego, przez thread-safe, aż po implementację z enum — i dlaczego ta ostatnia bywa najlepsza."
 categories:
-    - Java
-    - 'Java Snippets'
+  - Java
 tags:
-    - GoF
-    - java
-    - patterns
+  - java
+  - wzorce
+  - singleton
+  - gof
+  - snippet
     - snippets
     - wzorce
 ---
@@ -29,7 +29,7 @@ I to tyle… proste prawda? Okazuje się, że nie. Przede wszystkim wzorzec jest
 
 #### Jak wygląda zatem poprawna i szybka implementacja wzorca Singleton?
 
-```
+```java
 public class MySingleton {
 
     private MySingleton(){ } // wyłączamy konstruktor domyślny
@@ -50,7 +50,7 @@ Wśród błędnych implementacji często pojawiają się różne wariacje checke
 
 Inną ciekawą implementacją singletona jest oparcie go o **enum**. Wersję taką zaproponował Joshua Bloch w swojej książce:
 
-```
+```java
 public enum MyEnumSingleton {
     INSTANCE;
 

@@ -1,17 +1,17 @@
 ---
-id: 29
-title: 'Nie taki znowu zwykły SQL Server cz. 1 &#8211; słów kilka o CTE'
+title: 'Nie taki znowu zwykły SQL Server cz. 1 – słów kilka o CTE'
 date: '2017-03-07T20:47:18+01:00'
-author: sg
-layout: post
-guid: 'http://sgdev.pl/?p=29'
+layout: single
 permalink: /2017/03/07/nie-taki-znowu-zwykly-sql-server-cz-1-slow-kilka-o-wspolnych-wyrazeniach-tablicowych-cte/
+series: "Nie taki znów zwykły SQL Server"
+excerpt: "Wspólne wyrażenia tablicowe (CTE) to potężna funkcja SQL, którą znajdziesz po słowie kluczowym WITH. W tym pierwszym odcinku: czym są CTE, kiedy ich używać i praktyczny przykład — usuwanie duplikatów bez podzapytań."
 categories:
-    - 'Nie taki znów zwykły SQL'
+  - SQL Server
 tags:
-    - sql
-    - 'sql server'
-    - with
+  - sql
+  - sql-server
+  - cte
+  - with
 ---
 
 Niniejszym artykułem chciałbym rozpocząć cykl poświęcony przydatnym, ale rzadziej wykorzystywanym elementom języka SQL jak i samego MS SQL Server’a. Podstawowe operacje CRUD wykonujemy bez większych trudności już po krótkim szkoleniu, jednak niejednokrotnie brakuje narzędzia upraszczającego życie oraz lepiej pasującego do aktualnych okoliczności.
@@ -27,13 +27,13 @@ Przykłady będę uruchamiał na MS SQL Server – jest to najczęściej używan
 
 Jeżeli chcecie podążyć moją ścieżką sugeruję instalację za pomocą dockera:
 
-```
+```bash
 $ sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=yourSAPassword1(!)' -p 1433:1433 -d microsoft/mssql-s
 ```
 
 Ważna uwaga – stosujcie się do wymogów dot. hasła w przeciwnym wypadku może być tak, że kontener po prostu nie wystartuje i po kilku sekundach zobaczymy, że się po prostu wyłączył. Do weryfikacji, czy wszystko chodzi ok można użyć:
 
-```
+```bash
 $ sudo docker ps -a
 CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS                  PORTS                    NAMES
 b9c083f96995        microsoft/mssql-server-linux   "/bin/sh -c /opt/m..."   4 days ago          Up 2 seconds            0.0.0.0:1433->1433/tcp   affectionate_galileo
@@ -48,7 +48,7 @@ Otóż, i tak i nie – specjalną cechą CTE, jest możliwość obsługi rekure
 
 Jak wygląda zatem typowe wyrażenie tablicowe ? Najczęściej piszemy coś podobnego do kodu poniżej:
 
-```
+```sql
 WITH nazwa_wyrazenia (kolumna_1, kolumna_2) AS (
  -- tu definicja wyrażenia, przeważnie SELECT
 SELECT col_1 as kolumna_1, col_2 as kolumna_2 FROM tabela
@@ -61,7 +61,7 @@ Warto zwrócić uwagę, że definicja kolumn nie jest tak naprawdę potrzebna, o
 
 #### Przypadek użycia nr 1 – usuwanie zduplikowanych wersji w przyjemny sposób
 
-```
+```sql
 -- Na czystym SQL Server muszę stworzyć bazę
 
 CREATE DATABASE ShowCaseDb;
@@ -106,7 +106,7 @@ Jak widać troszkę omsknęła nam się dłoń podczas wstawiania danych i mamy 
 
 Co poradzić w takiej sytuacji ? Intuicja podpowiada nam, że musimy znaleźć wiersze które chcemy usunąć i… je usunąć. Gdybyśmy np. ponumerowali powtarzające się wiersze i zostawili sobie tylko jeden, wtedy wszystko powinno być ok. Użyjmy zatem funkcji okienkowej, rozdzielającej numerację względem wszystkich kolumn poza PK.
 
-```
+```sql
 SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by ID ) AS RN, *  FROM USERS
 ```
 
@@ -114,8 +114,8 @@ SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by ID ) AS RN, 
 
 Jak widać na obrazku jest już znacznie lepiej, teraz tylko wystarczy pozostawić wiersz o RN=1 i na końcu odpalić DELETE.
 
-```
-SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by ID ) AS RN, *  FROM USERS 
+```sql
+SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by ID ) AS RN, *  FROM USERS
 
 -- SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by ID ) AS RN, *  FROM USERS  WHERE RN > 1
 -- Msg 207, Level 16, State 1, Line 1
@@ -128,7 +128,7 @@ SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by ID ) AS RN, 
 
 Niestety nie ma tak lekko… funkcja okienkowa zmusza nas do użycia podzapytania. Czy nie wspominałem, że CTE są bardzo zbliżone do podzapytań ? Nie uprzedzając faktów:
 
-```
+```sql
 SELECT * FROM (
     SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by ID ) AS RN, *  FROM USERS
 ) INNER_QUERY WHERE INNER_QUERY.RN>1;
@@ -138,16 +138,16 @@ SELECT * FROM (
 
 Czyż nie o to nam chodziło teraz tylko usuwać!
 
-```
+```sql
 DELETE USERS FROM (
     SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by NAME ) AS RN, NAME,SURNAME,ORIGIN  FROM USERS
-    )  INNER_QUERY 
+    )  INNER_QUERY
 WHERE INNER_QUERY.RN > 1;
 ```
 
 Ale jak to *10 rows affected* ?! Cóż wygląda na to że pośpiech jest dobry przy łapaniu pcheł i wyczyściliśmy sobie całą tabelkę. Załadujmy wiersze jeszcze raz i… czy potraficie dostrzec pomyłkę ?
 
-```
+```sql
 -- Tak naprawdę nie chodziło nam o tabelkę, a o wynik podzapytania 
 -- z numeracją, co w konsekwencji spowoduje usunięcie wierszy 
 -- z tabeli pod spodem
@@ -160,10 +160,10 @@ WHERE INNER_QUERY.RN > 1;
 
 Okej okej, ale gdzie miejsce dla CTE w tym wszystkim, ktoś zapyta? Jak już wspominałem można je użyć jako podzapytanie.
 
-```
+```sql
 WITH USERS_CTE AS (
     SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by NAME ) AS RN, NAME,SURNAME,ORIGIN  FROM USERS
-    )   
+    )
 SELECT * FROM USERS_CTE WHERE RN > 1;
 ```
 
@@ -171,10 +171,10 @@ SELECT * FROM USERS_CTE WHERE RN > 1;
 
 A teraz pomyślmy jakby tu usunąć te rekordy ? Wystarczy SELECT \* zamienić na DELETE.
 
-```
+```sql
 WITH USERS_CTE AS (
     SELECT ROW_NUMBER() OVER (PARTITION BY NAME,SURNAME,ORIGIN order by NAME ) AS RN, NAME,SURNAME,ORIGIN  FROM USERS
-    )   
+    )
 DELETE FROM USERS_CTE WHERE RN > 1;
 ```
 
